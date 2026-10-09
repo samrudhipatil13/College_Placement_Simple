@@ -1,0 +1,1437 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Campus Insights — Placement Analytics</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<style>
+/* ═══════════════════════════════════════════════════════
+   RESET & BASE
+═══════════════════════════════════════════════════════ */
+*{margin:0;padding:0;box-sizing:border-box;}
+:root{
+  --blue:#2563eb;--blue-dark:#1d4ed8;--blue-light:#dbeafe;
+  --teal:#0ea5e9;--indigo:#4f46e5;
+  --green:#16a34a;--green-light:#dcfce7;
+  --red:#dc2626;--red-light:#fee2e2;
+  --amber:#d97706;--amber-light:#fef3c7;
+  --gray-50:#f8fafc;--gray-100:#f1f5f9;--gray-200:#e2e8f0;
+  --gray-300:#cbd5e1;--gray-400:#94a3b8;--gray-500:#64748b;
+  --gray-600:#475569;--gray-700:#334155;--gray-800:#1e293b;--gray-900:#0f172a;
+  --white:#ffffff;
+  --shadow-sm:0 1px 3px rgba(0,0,0,.08);
+  --shadow:0 4px 16px rgba(0,0,0,.10);
+  --shadow-lg:0 12px 40px rgba(0,0,0,.15);
+  --radius:12px;--radius-sm:8px;--radius-lg:18px;
+}
+body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--gray-50);color:var(--gray-800);min-height:100vh;}
+button{cursor:pointer;font-family:inherit;}
+input{font-family:inherit;}
+.hidden{display:none!important;}
+
+/* ═══════════════════════════════════════════════════════
+   PAGE SYSTEM
+═══════════════════════════════════════════════════════ */
+.page{display:none;min-height:100vh;}
+.page.active{display:flex;flex-direction:column;}
+
+/* ═══════════════════════════════════════════════════════
+   1. LANDING PAGE
+═══════════════════════════════════════════════════════ */
+#page-landing{
+  background:linear-gradient(135deg,#0f172a 0%,#1e3a5f 50%,#0f2a4a 100%);
+  position:relative;overflow:hidden;
+}
+#page-landing::before{
+  content:'';position:absolute;inset:0;
+  background:url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.03'%3E%3Ccircle cx='30' cy='30' r='2'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+}
+.landing-nav{
+  position:relative;z-index:10;display:flex;align-items:center;justify-content:space-between;
+  padding:20px 60px;border-bottom:1px solid rgba(255,255,255,.08);
+}
+.nav-logo{display:flex;align-items:center;gap:10px;}
+.nav-logo-icon{width:36px;height:36px;background:var(--blue);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:18px;}
+.nav-logo-text{color:white;font-weight:700;font-size:18px;}
+.nav-links{display:flex;gap:32px;}
+.nav-links a{color:rgba(255,255,255,.7);text-decoration:none;font-size:14px;transition:color .2s;}
+.nav-links a:hover{color:white;}
+.nav-btn{background:var(--blue);color:white;border:none;padding:8px 22px;border-radius:8px;font-size:14px;font-weight:600;transition:background .2s;}
+.nav-btn:hover{background:var(--blue-dark);}
+
+.landing-hero{
+  position:relative;z-index:10;flex:1;display:flex;align-items:center;
+  padding:80px 60px;gap:60px;
+}
+.hero-left{flex:1;max-width:580px;}
+.hero-eyebrow{
+  display:inline-flex;align-items:center;gap:8px;
+  background:rgba(37,99,235,.25);border:1px solid rgba(37,99,235,.4);
+  color:#93c5fd;padding:6px 14px;border-radius:999px;font-size:13px;font-weight:500;
+  margin-bottom:24px;
+}
+.hero-title{font-size:52px;font-weight:800;color:white;line-height:1.15;margin-bottom:16px;}
+.hero-title span{color:#60a5fa;}
+.hero-desc{color:rgba(255,255,255,.65);font-size:17px;line-height:1.7;margin-bottom:36px;}
+.hero-btns{display:flex;gap:14px;flex-wrap:wrap;}
+.btn-primary{
+  background:var(--blue);color:white;border:none;padding:13px 28px;
+  border-radius:10px;font-size:15px;font-weight:600;transition:all .2s;
+  box-shadow:0 4px 20px rgba(37,99,235,.4);
+}
+.btn-primary:hover{background:var(--blue-dark);transform:translateY(-1px);}
+.btn-outline{
+  background:transparent;color:white;border:1.5px solid rgba(255,255,255,.3);
+  padding:13px 28px;border-radius:10px;font-size:15px;font-weight:500;transition:all .2s;
+}
+.btn-outline:hover{border-color:white;background:rgba(255,255,255,.08);}
+
+.hero-stats{display:flex;gap:32px;margin-top:40px;}
+.hero-stat{text-align:left;}
+.hero-stat-num{font-size:28px;font-weight:800;color:white;}
+.hero-stat-label{font-size:13px;color:rgba(255,255,255,.5);margin-top:2px;}
+
+.hero-right{flex:1;display:flex;justify-content:center;align-items:center;}
+.hero-card{
+  background:rgba(255,255,255,.07);backdrop-filter:blur(20px);
+  border:1px solid rgba(255,255,255,.12);border-radius:20px;
+  padding:28px;width:340px;
+}
+.hero-card-title{color:white;font-size:15px;font-weight:600;margin-bottom:20px;display:flex;align-items:center;gap:8px;}
+.mini-chart-bars{display:flex;align-items:flex-end;gap:8px;height:100px;margin-bottom:16px;}
+.mini-bar{flex:1;border-radius:4px 4px 0 0;transition:height .5s;}
+.mini-bar.cse{background:linear-gradient(to top,#3b82f6,#60a5fa);height:90%;}
+.mini-bar.it{background:linear-gradient(to top,#8b5cf6,#a78bfa);height:72%;}
+.mini-bar.mech{background:linear-gradient(to top,#f59e0b,#fbbf24);height:55%;}
+.mini-bar.civil{background:linear-gradient(to top,#10b981,#34d399);height:62%;}
+.mini-bar-labels{display:flex;gap:8px;}
+.mini-bar-label{flex:1;text-align:center;font-size:11px;color:rgba(255,255,255,.5);}
+.hero-card-kpis{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:16px;}
+.hero-kpi{background:rgba(255,255,255,.06);border-radius:10px;padding:12px;}
+.hero-kpi-val{font-size:20px;font-weight:700;color:white;}
+.hero-kpi-label{font-size:11px;color:rgba(255,255,255,.5);margin-top:2px;}
+
+.features-strip{
+  position:relative;z-index:10;
+  background:rgba(255,255,255,.04);border-top:1px solid rgba(255,255,255,.07);
+  padding:28px 60px;display:flex;gap:40px;
+}
+.feature-item{display:flex;align-items:center;gap:12px;}
+.feature-icon{font-size:20px;}
+.feature-text strong{display:block;color:white;font-size:14px;}
+.feature-text span{color:rgba(255,255,255,.5);font-size:12px;}
+
+/* ═══════════════════════════════════════════════════════
+   2. ROLE SELECTION PAGE
+═══════════════════════════════════════════════════════ */
+#page-role{
+  background:linear-gradient(135deg,#f0f9ff 0%,#e0f2fe 50%,#f0fdf4 100%);
+  justify-content:center;align-items:center;
+}
+.role-box{text-align:center;max-width:600px;width:100%;padding:40px 20px;}
+.role-box h1{font-size:32px;font-weight:800;color:var(--gray-800);margin-bottom:8px;}
+.role-box p{color:var(--gray-500);font-size:15px;margin-bottom:48px;}
+.role-cards{display:flex;gap:24px;justify-content:center;}
+.role-card{
+  background:white;border:2px solid var(--gray-200);border-radius:20px;
+  padding:36px 32px;flex:1;max-width:220px;transition:all .25s;cursor:pointer;
+}
+.role-card:hover{border-color:var(--blue);transform:translateY(-4px);box-shadow:var(--shadow-lg);}
+.role-icon{
+  width:64px;height:64px;border-radius:16px;margin:0 auto 20px;
+  display:flex;align-items:center;justify-content:center;font-size:28px;
+}
+.role-icon.admin{background:linear-gradient(135deg,#3b82f6,#6366f1);}
+.role-icon.student{background:linear-gradient(135deg,#10b981,#0ea5e9);}
+.role-card h3{font-size:18px;font-weight:700;color:var(--gray-800);margin-bottom:8px;}
+.role-card p{font-size:13px;color:var(--gray-500);line-height:1.5;margin-bottom:24px;}
+.role-btn{
+  width:100%;padding:11px;border-radius:10px;border:none;
+  font-size:14px;font-weight:600;transition:all .2s;
+}
+.role-btn.admin{background:linear-gradient(135deg,#3b82f6,#6366f1);color:white;}
+.role-btn.student{background:linear-gradient(135deg,#10b981,#0ea5e9);color:white;}
+.role-btn:hover{opacity:.9;transform:translateY(-1px);}
+.role-back{margin-top:32px;color:var(--gray-400);font-size:14px;cursor:pointer;transition:color .2s;}
+.role-back:hover{color:var(--blue);}
+
+/* ═══════════════════════════════════════════════════════
+   3. LOGIN PAGES
+═══════════════════════════════════════════════════════ */
+#page-admin-login,#page-student-login{
+  background:linear-gradient(135deg,#0f172a,#1e3a5f);
+  justify-content:center;align-items:center;
+}
+.login-split{display:flex;width:100%;max-width:900px;min-height:520px;border-radius:24px;overflow:hidden;box-shadow:var(--shadow-lg);}
+.login-left{
+  flex:1;background:linear-gradient(135deg,#1d4ed8,#4f46e5);
+  padding:48px;display:flex;flex-direction:column;justify-content:center;
+}
+.login-left-logo{display:flex;align-items:center;gap:10px;margin-bottom:40px;}
+.login-left-logo-icon{width:40px;height:40px;background:rgba(255,255,255,.2);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:20px;}
+.login-left-logo-text{color:white;font-weight:700;font-size:16px;}
+.login-left h2{font-size:30px;font-weight:800;color:white;margin-bottom:12px;}
+.login-left p{color:rgba(255,255,255,.7);font-size:14px;line-height:1.6;margin-bottom:36px;}
+.login-left-img{font-size:80px;text-align:center;margin-top:auto;}
+.login-right{flex:1;background:white;padding:48px;}
+.login-right h2{font-size:24px;font-weight:800;color:var(--gray-800);margin-bottom:6px;}
+.login-right p{color:var(--gray-500);font-size:14px;margin-bottom:32px;}
+.form-group{margin-bottom:20px;}
+.form-label{display:block;font-size:13px;font-weight:600;color:var(--gray-700);margin-bottom:6px;}
+.form-input-wrap{position:relative;}
+.form-input-icon{position:absolute;left:12px;top:50%;transform:translateY(-50%);font-size:16px;color:var(--gray-400);}
+.form-input{
+  width:100%;padding:11px 12px 11px 38px;border:1.5px solid var(--gray-200);
+  border-radius:10px;font-size:14px;color:var(--gray-800);transition:border .2s;outline:none;
+}
+.form-input:focus{border-color:var(--blue);}
+.form-row{display:flex;justify-content:space-between;align-items:center;margin-bottom:24px;}
+.form-check{display:flex;align-items:center;gap:8px;font-size:13px;color:var(--gray-600);}
+.form-check input{accent-color:var(--blue);}
+.form-link{font-size:13px;color:var(--blue);text-decoration:none;cursor:pointer;}
+.form-link:hover{text-decoration:underline;}
+.login-btn{
+  width:100%;padding:13px;background:linear-gradient(135deg,var(--blue),var(--indigo));
+  color:white;border:none;border-radius:10px;font-size:15px;font-weight:600;
+  transition:all .2s;box-shadow:0 4px 14px rgba(37,99,235,.35);
+}
+.login-btn.green{background:linear-gradient(135deg,#10b981,#0ea5e9);box-shadow:0 4px 14px rgba(16,185,129,.35);}
+.login-btn:hover{transform:translateY(-1px);opacity:.95;}
+.login-back{text-align:center;margin-top:20px;font-size:13px;color:var(--gray-500);}
+.login-back span{color:var(--blue);cursor:pointer;}
+.login-back span:hover{text-decoration:underline;}
+.login-secure{text-align:center;font-size:11px;color:var(--gray-400);margin-top:16px;}
+.login-error{background:#fee2e2;color:#dc2626;padding:10px 14px;border-radius:8px;font-size:13px;margin-bottom:16px;display:none;}
+
+/* ═══════════════════════════════════════════════════════
+   4. ADMIN DASHBOARD LAYOUT
+═══════════════════════════════════════════════════════ */
+#page-admin-dashboard{flex-direction:row;}
+.sidebar{
+  width:220px;min-height:100vh;background:var(--gray-900);
+  display:flex;flex-direction:column;flex-shrink:0;position:sticky;top:0;height:100vh;overflow-y:auto;
+}
+.sidebar-logo{padding:24px 20px;border-bottom:1px solid rgba(255,255,255,.08);}
+.sidebar-logo-top{display:flex;align-items:center;gap:10px;}
+.sidebar-logo-icon{width:32px;height:32px;background:var(--blue);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:16px;}
+.sidebar-logo-text{color:white;font-weight:700;font-size:15px;}
+.sidebar-logo-sub{color:rgba(255,255,255,.35);font-size:11px;margin-top:4px;}
+.sidebar-nav{flex:1;padding:16px 0;}
+.sidebar-section{padding:8px 20px 4px;font-size:10px;font-weight:600;color:rgba(255,255,255,.25);letter-spacing:.08em;text-transform:uppercase;}
+.nav-item{
+  display:flex;align-items:center;gap:10px;padding:10px 20px;
+  color:rgba(255,255,255,.55);font-size:14px;cursor:pointer;transition:all .2s;border-left:3px solid transparent;
+}
+.nav-item:hover{color:white;background:rgba(255,255,255,.06);}
+.nav-item.active{color:white;background:rgba(37,99,235,.25);border-left-color:var(--blue);}
+.nav-item-icon{font-size:16px;width:20px;text-align:center;}
+.sidebar-user{
+  padding:16px 20px;border-top:1px solid rgba(255,255,255,.08);
+  display:flex;align-items:center;gap:10px;
+}
+.sidebar-avatar{width:34px;height:34px;background:var(--blue);border-radius:50%;display:flex;align-items:center;justify-content:center;color:white;font-size:13px;font-weight:700;}
+.sidebar-user-info strong{display:block;color:white;font-size:13px;}
+.sidebar-user-info span{color:rgba(255,255,255,.4);font-size:11px;}
+.sidebar-logout{margin-left:auto;color:rgba(255,255,255,.4);cursor:pointer;font-size:16px;transition:color .2s;}
+.sidebar-logout:hover{color:white;}
+
+.main-content{flex:1;overflow-y:auto;display:flex;flex-direction:column;}
+.topbar{
+  background:white;padding:16px 28px;display:flex;align-items:center;justify-content:space-between;
+  border-bottom:1px solid var(--gray-200);position:sticky;top:0;z-index:100;
+}
+.topbar-title{font-size:18px;font-weight:700;color:var(--gray-800);}
+.topbar-right{display:flex;align-items:center;gap:16px;}
+.topbar-year{
+  background:var(--gray-100);border:1px solid var(--gray-200);border-radius:8px;
+  padding:6px 12px;font-size:13px;color:var(--gray-700);display:flex;align-items:center;gap:6px;cursor:pointer;
+}
+.topbar-bell{font-size:20px;cursor:pointer;color:var(--gray-500);position:relative;}
+.topbar-badge{
+  position:absolute;top:-2px;right:-2px;width:8px;height:8px;
+  background:var(--red);border-radius:50%;border:1.5px solid white;
+}
+
+/* ═══════════════════════════════════════════════════════
+   DASHBOARD CONTENT SECTIONS
+═══════════════════════════════════════════════════════ */
+.section-content{padding:24px 28px;display:none;}
+.section-content.active{display:block;}
+
+/* KPI CARDS */
+.kpi-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:24px;}
+.kpi-card{
+  background:white;border-radius:var(--radius);padding:20px;
+  border:1px solid var(--gray-200);transition:box-shadow .2s;
+}
+.kpi-card:hover{box-shadow:var(--shadow);}
+.kpi-top{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:12px;}
+.kpi-icon{width:40px;height:40px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:18px;}
+.kpi-badge{font-size:12px;font-weight:600;padding:3px 8px;border-radius:999px;}
+.kpi-badge.up{background:var(--green-light);color:var(--green);}
+.kpi-badge.down{background:var(--red-light);color:var(--red);}
+.kpi-val{font-size:28px;font-weight:800;color:var(--gray-800);margin-bottom:4px;}
+.kpi-label{font-size:13px;color:var(--gray-500);}
+
+/* CHARTS GRID */
+.charts-grid{display:grid;grid-template-columns:2fr 1fr;gap:16px;margin-bottom:24px;}
+.chart-card{background:white;border-radius:var(--radius);padding:20px;border:1px solid var(--gray-200);}
+.chart-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;}
+.chart-title{font-size:15px;font-weight:700;color:var(--gray-800);}
+.chart-subtitle{font-size:12px;color:var(--gray-400);margin-top:2px;}
+.chart-tag{font-size:11px;background:var(--blue-light);color:var(--blue);padding:3px 10px;border-radius:999px;font-weight:600;}
+.chart-wrap{position:relative;height:220px;}
+
+.charts-grid-3{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-bottom:24px;}
+
+/* RECENT ACTIVITY */
+.recent-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:24px;}
+.activity-list{list-style:none;}
+.activity-item{display:flex;align-items:center;gap:12px;padding:10px 0;border-bottom:1px solid var(--gray-100);}
+.activity-item:last-child{border-bottom:none;}
+.activity-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;}
+.activity-text{font-size:13px;color:var(--gray-700);flex:1;}
+.activity-time{font-size:11px;color:var(--gray-400);}
+
+/* BRANCH PLACEMENT MINI TABLE */
+.mini-table{width:100%;}
+.mini-table-row{display:flex;align-items:center;gap:12px;padding:8px 0;border-bottom:1px solid var(--gray-100);}
+.mini-table-row:last-child{border-bottom:none;}
+.mini-table-label{font-size:13px;color:var(--gray-700);width:80px;flex-shrink:0;}
+.mini-table-bar-wrap{flex:1;background:var(--gray-100);border-radius:999px;height:6px;}
+.mini-table-bar{height:6px;border-radius:999px;}
+.mini-table-val{font-size:12px;font-weight:600;color:var(--gray-700);width:36px;text-align:right;}
+
+/* ═══════════════════════════════════════════════════════
+   DATA TABLE (Students / Companies / Placements)
+═══════════════════════════════════════════════════════ */
+.table-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;}
+.table-title{font-size:18px;font-weight:700;color:var(--gray-800);}
+.table-add-btn{
+  background:var(--blue);color:white;border:none;padding:9px 18px;
+  border-radius:8px;font-size:13px;font-weight:600;transition:background .2s;
+}
+.table-add-btn:hover{background:var(--blue-dark);}
+.table-filters{display:flex;gap:10px;align-items:center;margin-bottom:16px;flex-wrap:wrap;}
+.table-search{
+  flex:1;min-width:200px;padding:9px 12px 9px 36px;border:1.5px solid var(--gray-200);
+  border-radius:8px;font-size:13px;outline:none;background:white;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%2394a3b8' stroke-width='2'%3E%3Ccircle cx='11' cy='11' r='8'/%3E%3Cpath d='m21 21-4.35-4.35'/%3E%3C/svg%3E");
+  background-repeat:no-repeat;background-position:10px center;
+}
+.table-search:focus{border-color:var(--blue);}
+.table-select{
+  padding:9px 12px;border:1.5px solid var(--gray-200);border-radius:8px;
+  font-size:13px;color:var(--gray-700);outline:none;background:white;cursor:pointer;
+}
+.table-filter-btn{
+  padding:9px 16px;background:white;border:1.5px solid var(--gray-200);
+  border-radius:8px;font-size:13px;color:var(--gray-600);cursor:pointer;transition:all .2s;
+}
+.table-filter-btn:hover{border-color:var(--blue);color:var(--blue);}
+.table-wrap{background:white;border-radius:var(--radius);border:1px solid var(--gray-200);overflow:hidden;}
+table{width:100%;border-collapse:collapse;}
+thead tr{background:var(--gray-50);}
+th{padding:12px 16px;text-align:left;font-size:12px;font-weight:600;color:var(--gray-500);text-transform:uppercase;letter-spacing:.04em;border-bottom:1px solid var(--gray-200);}
+td{padding:13px 16px;font-size:13px;color:var(--gray-700);border-bottom:1px solid var(--gray-100);}
+tr:last-child td{border-bottom:none;}
+tr:hover td{background:var(--gray-50);}
+.badge{display:inline-flex;align-items:center;gap:5px;padding:3px 10px;border-radius:999px;font-size:12px;font-weight:600;}
+.badge.placed,.badge.completed,.badge.accepted{background:var(--green-light);color:var(--green);}
+.badge.not-placed,.badge.pending{background:var(--red-light);color:var(--red);}
+.badge.upcoming{background:var(--amber-light);color:var(--amber);}
+.badge.cse{background:#dbeafe;color:#1d4ed8;}
+.badge.it{background:#ede9fe;color:#6d28d9;}
+.badge.mechanical{background:#fef3c7;color:#92400e;}
+.badge.civil{background:#dcfce7;color:#166534;}
+.table-actions{display:flex;gap:6px;}
+.action-btn{width:28px;height:28px;border-radius:6px;border:none;display:flex;align-items:center;justify-content:center;font-size:14px;cursor:pointer;transition:all .2s;}
+.action-btn.edit{background:#dbeafe;color:#1d4ed8;}
+.action-btn.del{background:#fee2e2;color:#dc2626;}
+.action-btn:hover{opacity:.8;transform:scale(1.1);}
+.table-pagination{display:flex;align-items:center;justify-content:space-between;padding:14px 16px;border-top:1px solid var(--gray-100);}
+.pagination-info{font-size:13px;color:var(--gray-500);}
+.pagination-btns{display:flex;gap:4px;}
+.page-btn{
+  width:32px;height:32px;border-radius:6px;border:1.5px solid var(--gray-200);
+  background:white;font-size:13px;color:var(--gray-600);cursor:pointer;transition:all .2s;
+  display:flex;align-items:center;justify-content:center;
+}
+.page-btn.active{background:var(--blue);border-color:var(--blue);color:white;}
+.page-btn:hover:not(.active){border-color:var(--blue);color:var(--blue);}
+
+/* ═══════════════════════════════════════════════════════
+   ANALYTICS PAGE
+═══════════════════════════════════════════════════════ */
+.analytics-tabs{display:flex;gap:4px;background:var(--gray-100);border-radius:10px;padding:4px;margin-bottom:20px;width:fit-content;}
+.analytics-tab{padding:7px 16px;border-radius:8px;font-size:13px;font-weight:500;color:var(--gray-600);cursor:pointer;transition:all .2s;border:none;background:transparent;}
+.analytics-tab.active{background:white;color:var(--blue);font-weight:600;box-shadow:var(--shadow-sm);}
+.analytics-kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:20px;}
+.analytics-kpi{background:white;border-radius:var(--radius);padding:16px;border:1px solid var(--gray-200);}
+.analytics-kpi-val{font-size:24px;font-weight:800;color:var(--gray-800);}
+.analytics-kpi-change{font-size:12px;margin-top:2px;}
+.analytics-kpi-change.up{color:var(--green);}
+.analytics-kpi-change.down{color:var(--red);}
+.analytics-kpi-label{font-size:12px;color:var(--gray-500);margin-top:4px;}
+.analytics-charts-main{display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px;margin-bottom:16px;}
+.analytics-bottom{display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px;}
+
+/* REPORTS PAGE */
+.reports-intro{font-size:14px;color:var(--gray-500);margin-bottom:24px;}
+.reports-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-bottom:24px;}
+.report-card{background:white;border:1px solid var(--gray-200);border-radius:var(--radius);padding:20px;}
+.report-card h4{font-size:14px;font-weight:700;color:var(--gray-800);margin-bottom:6px;}
+.report-card p{font-size:12px;color:var(--gray-500);margin-bottom:16px;line-height:1.5;}
+.report-gen-btn{
+  width:100%;padding:9px;background:var(--blue);color:white;border:none;
+  border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;transition:background .2s;
+}
+.report-gen-btn:hover{background:var(--blue-dark);}
+.reports-filters{background:white;border:1px solid var(--gray-200);border-radius:var(--radius);padding:20px;margin-bottom:20px;}
+.reports-filters h4{font-size:14px;font-weight:700;color:var(--gray-800);margin-bottom:16px;}
+.filter-row{display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px;margin-bottom:12px;}
+.filter-group label{display:block;font-size:12px;font-weight:600;color:var(--gray-600);margin-bottom:6px;}
+.filter-group select{width:100%;padding:9px 12px;border:1.5px solid var(--gray-200);border-radius:8px;font-size:13px;outline:none;}
+.apply-filters-btn{
+  padding:9px 20px;background:var(--blue);color:white;border:none;
+  border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;transition:background .2s;
+}
+.apply-filters-btn:hover{background:var(--blue-dark);}
+.recent-reports{background:white;border:1px solid var(--gray-200);border-radius:var(--radius);padding:20px;}
+.recent-reports h4{font-size:14px;font-weight:700;color:var(--gray-800);margin-bottom:14px;}
+
+/* STUDENT DASHBOARD */
+#page-student-dashboard{flex-direction:row;}
+.student-topbar{
+  background:white;padding:16px 28px;display:flex;align-items:center;justify-content:space-between;
+  border-bottom:1px solid var(--gray-200);
+}
+.student-content{flex:1;padding:24px 28px;overflow-y:auto;}
+.welcome-banner{
+  background:linear-gradient(135deg,var(--blue),var(--indigo));border-radius:16px;
+  padding:24px 28px;color:white;margin-bottom:24px;position:relative;overflow:hidden;
+}
+.welcome-banner::after{
+  content:'🎓';position:absolute;right:28px;top:50%;transform:translateY(-50%);
+  font-size:48px;opacity:.3;
+}
+.welcome-banner h2{font-size:20px;font-weight:700;margin-bottom:4px;}
+.welcome-banner p{font-size:14px;opacity:.8;}
+.student-status-card{
+  background:white;border-radius:var(--radius);border:1px solid var(--gray-200);
+  padding:20px;margin-bottom:20px;
+}
+.status-row{display:flex;gap:16px;flex-wrap:wrap;}
+.status-item{flex:1;min-width:120px;}
+.status-item-label{font-size:11px;font-weight:600;color:var(--gray-500);text-transform:uppercase;letter-spacing:.04em;margin-bottom:6px;}
+.status-item-val{font-size:14px;font-weight:600;color:var(--gray-800);}
+.student-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:20px;}
+.timeline-item{display:flex;gap:12px;padding:10px 0;border-bottom:1px solid var(--gray-100);}
+.timeline-item:last-child{border-bottom:none;}
+.timeline-icon{width:32px;height:32px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0;}
+.timeline-text strong{display:block;font-size:13px;color:var(--gray-800);}
+.timeline-text span{font-size:11px;color:var(--gray-400);}
+.profile-completion{
+  background:white;border-radius:var(--radius);border:1px solid var(--gray-200);padding:20px;
+}
+.profile-pct{font-size:32px;font-weight:800;color:var(--blue);text-align:center;margin-bottom:4px;}
+.profile-bar-wrap{background:var(--gray-100);border-radius:999px;height:8px;margin:10px 0;}
+.profile-bar{height:8px;border-radius:999px;background:linear-gradient(to right,var(--blue),var(--teal));}
+
+/* ═══════════════════════════════════════════════════════
+   SETTINGS
+═══════════════════════════════════════════════════════ */
+.settings-grid{display:grid;grid-template-columns:1fr 2fr;gap:20px;}
+.settings-nav{background:white;border-radius:var(--radius);border:1px solid var(--gray-200);padding:8px 0;height:fit-content;}
+.settings-nav-item{padding:12px 20px;font-size:14px;color:var(--gray-600);cursor:pointer;transition:all .2s;}
+.settings-nav-item:hover,.settings-nav-item.active{background:var(--blue-light);color:var(--blue);font-weight:600;}
+.settings-panel{background:white;border-radius:var(--radius);border:1px solid var(--gray-200);padding:24px;}
+.settings-panel h3{font-size:16px;font-weight:700;color:var(--gray-800);margin-bottom:6px;}
+.settings-panel p{font-size:13px;color:var(--gray-500);margin-bottom:24px;}
+.settings-form .form-group{margin-bottom:18px;}
+.settings-form .form-label{font-size:13px;font-weight:600;color:var(--gray-700);margin-bottom:6px;display:block;}
+.settings-form .form-input{padding:10px 14px;border:1.5px solid var(--gray-200);border-radius:9px;font-size:14px;width:100%;outline:none;}
+.settings-form .form-input:focus{border-color:var(--blue);}
+.save-btn{background:var(--blue);color:white;border:none;padding:11px 24px;border-radius:9px;font-size:14px;font-weight:600;cursor:pointer;transition:background .2s;}
+.save-btn:hover{background:var(--blue-dark);}
+
+/* ═══════════════════════════════════════════════════════
+   TOAST
+═══════════════════════════════════════════════════════ */
+.toast{
+  position:fixed;bottom:28px;right:28px;background:var(--gray-800);color:white;
+  padding:12px 20px;border-radius:10px;font-size:14px;font-weight:500;
+  box-shadow:var(--shadow-lg);z-index:9999;transform:translateY(20px);opacity:0;
+  transition:all .3s;pointer-events:none;
+}
+.toast.show{transform:translateY(0);opacity:1;}
+.toast.success{background:var(--green);}
+.toast.error{background:var(--red);}
+
+/* ═══════════════════════════════════════════════════════
+   MODAL
+═══════════════════════════════════════════════════════ */
+.modal-overlay{
+  position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:1000;
+  display:flex;align-items:center;justify-content:center;display:none;
+}
+.modal-overlay.open{display:flex;}
+.modal{background:white;border-radius:16px;padding:28px;width:480px;max-width:95vw;box-shadow:var(--shadow-lg);}
+.modal-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;}
+.modal-title{font-size:18px;font-weight:700;color:var(--gray-800);}
+.modal-close{background:var(--gray-100);border:none;width:30px;height:30px;border-radius:8px;cursor:pointer;font-size:16px;}
+.modal .form-group{margin-bottom:16px;}
+.modal .form-label{font-size:13px;font-weight:600;color:var(--gray-700);margin-bottom:6px;display:block;}
+.modal .form-input{padding:10px 12px;border:1.5px solid var(--gray-200);border-radius:8px;font-size:14px;width:100%;outline:none;}
+.modal .form-input:focus{border-color:var(--blue);}
+.modal-footer{display:flex;gap:10px;justify-content:flex-end;margin-top:20px;}
+.modal-cancel{padding:10px 20px;background:var(--gray-100);color:var(--gray-700);border:none;border-radius:8px;font-size:14px;font-weight:500;cursor:pointer;}
+.modal-submit{padding:10px 24px;background:var(--blue);color:white;border:none;border-radius:8px;font-size:14px;font-weight:600;cursor:pointer;transition:background .2s;}
+.modal-submit:hover{background:var(--blue-dark);}
+</style>
+</head>
+<body>
+
+<!-- ═══════════════════════════════════════════════════
+  PAGE 1: LANDING
+═══════════════════════════════════════════════════ -->
+<div id="page-landing" class="page active">
+  <nav class="landing-nav">
+    <div class="nav-logo">
+      <div class="nav-logo-icon">🎓</div>
+      <span class="nav-logo-text">Campus Insights</span>
+    </div>
+    <div class="nav-links">
+      <a href="#">Home</a><a href="#">Features</a><a href="#">Dashboard</a>
+      <a href="#">About</a><a href="#">Contact</a>
+    </div>
+    <button class="nav-btn" onclick="showPage('page-role')">Login</button>
+  </nav>
+
+  <div class="landing-hero">
+    <div class="hero-left">
+      <div class="hero-eyebrow">✦ Placement Analytics Platform</div>
+      <h1 class="hero-title">Placement Analytics<br><span>Dashboard</span></h1>
+      <p class="hero-desc">Comprehensive insights and analytics to improve placement outcomes and drive better decisions for students, faculty, and placement cells.</p>
+      <div class="hero-btns">
+        <button class="btn-primary" onclick="showPage('page-role')">Explore Dashboard →</button>
+        <button class="btn-outline">Learn More</button>
+      </div>
+      <div class="hero-stats">
+        <div class="hero-stat"><div class="hero-stat-num">500+</div><div class="hero-stat-label">Students</div></div>
+        <div class="hero-stat"><div class="hero-stat-num">180+</div><div class="hero-stat-label">Companies</div></div>
+        <div class="hero-stat"><div class="hero-stat-num">84%</div><div class="hero-stat-label">Placement Rate</div></div>
+        <div class="hero-stat"><div class="hero-stat-num">₹35 LPA</div><div class="hero-stat-label">Highest Package</div></div>
+      </div>
+    </div>
+    <div class="hero-right">
+      <div class="hero-card">
+        <div class="hero-card-title">📊 Branch-wise Placement %</div>
+        <div class="mini-chart-bars">
+          <div class="mini-bar cse"></div>
+          <div class="mini-bar it"></div>
+          <div class="mini-bar mech"></div>
+          <div class="mini-bar civil"></div>
+        </div>
+        <div class="mini-bar-labels">
+          <span class="mini-bar-label">CSE</span>
+          <span class="mini-bar-label">IT</span>
+          <span class="mini-bar-label">Mech</span>
+          <span class="mini-bar-label">Civil</span>
+        </div>
+        <div class="hero-card-kpis">
+          <div class="hero-kpi"><div class="hero-kpi-val">84%</div><div class="hero-kpi-label">Placement Rate</div></div>
+          <div class="hero-kpi"><div class="hero-kpi-val">₹7.8L</div><div class="hero-kpi-label">Avg Package</div></div>
+          <div class="hero-kpi"><div class="hero-kpi-val">38</div><div class="hero-kpi-label">Companies</div></div>
+          <div class="hero-kpi"><div class="hero-kpi-val">5 Yrs</div><div class="hero-kpi-label">Data Range</div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="features-strip">
+    <div class="feature-item"><div class="feature-icon">📡</div><div class="feature-text"><strong>Real-time Analytics</strong><span>Get live insights</span></div></div>
+    <div class="feature-item"><div class="feature-icon">📋</div><div class="feature-text"><strong>Smart Reports</strong><span>Generate detailed reports</span></div></div>
+    <div class="feature-item"><div class="feature-icon">🏢</div><div class="feature-text"><strong>Company Insights</strong><span>Track company drives</span></div></div>
+    <div class="feature-item"><div class="feature-icon">👨‍🎓</div><div class="feature-text"><strong>Student Tracking</strong><span>Monitor student progress</span></div></div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════
+  PAGE 2: ROLE SELECTION
+═══════════════════════════════════════════════════ -->
+<div id="page-role" class="page">
+  <div class="role-box">
+    <h1>Select Your Role</h1>
+    <p>Choose the portal that best suits you</p>
+    <div class="role-cards">
+      <div class="role-card" onclick="showPage('page-admin-login')">
+        <div class="role-icon admin">👨‍💼</div>
+        <h3>Admin</h3>
+        <p>Access admin dashboard to manage students, companies, placements, and reports.</p>
+        <button class="role-btn admin">Login as Admin →</button>
+      </div>
+      <div class="role-card" onclick="showPage('page-student-login')">
+        <div class="role-icon student">👨‍🎓</div>
+        <h3>Student</h3>
+        <p>View placement opportunities, apply for jobs and track your placement status.</p>
+        <button class="role-btn student">Login as Student →</button>
+      </div>
+    </div>
+    <div class="role-back" onclick="showPage('page-landing')">← Back to Home</div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════
+  PAGE 3: ADMIN LOGIN
+═══════════════════════════════════════════════════ -->
+<div id="page-admin-login" class="page">
+  <div class="login-split">
+    <div class="login-left">
+      <div class="login-left-logo">
+        <div class="login-left-logo-icon">🎓</div>
+        <span class="login-left-logo-text">Campus Insights<br><small style="font-size:11px;opacity:.6">Placement Analytics</small></span>
+      </div>
+      <h2>Welcome Back!</h2>
+      <p>Sign in to your admin account to access the full placement analytics dashboard and manage all records.</p>
+      <div class="login-left-img">👨‍💼</div>
+    </div>
+    <div class="login-right">
+      <h2>Admin Login</h2>
+      <p>Sign in to your admin account</p>
+      <div class="login-error" id="admin-error">Invalid credentials. Try admin / admin123</div>
+      <div class="form-group">
+        <label class="form-label">Email Address</label>
+        <div class="form-input-wrap">
+          <span class="form-input-icon">✉️</span>
+          <input class="form-input" id="admin-user" type="text" placeholder="admin@college.edu" value="admin"/>
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Password</label>
+        <div class="form-input-wrap">
+          <span class="form-input-icon">🔒</span>
+          <input class="form-input" id="admin-pass" type="password" placeholder="••••••••••" value="admin123"/>
+        </div>
+      </div>
+      <div class="form-row">
+        <label class="form-check"><input type="checkbox" checked/> Remember Me</label>
+        <a class="form-link">Forgot Password?</a>
+      </div>
+      <button class="login-btn" onclick="adminLogin()">Login</button>
+      <div class="login-back">Back to role selection? <span onclick="showPage('page-role')">Click here</span></div>
+      <div class="login-secure">🔒 Secure access to your dashboard</div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════
+  PAGE 4: STUDENT LOGIN
+═══════════════════════════════════════════════════ -->
+<div id="page-student-login" class="page">
+  <div class="login-split">
+    <div class="login-left" style="background:linear-gradient(135deg,#059669,#0ea5e9)">
+      <div class="login-left-logo">
+        <div class="login-left-logo-icon">🎓</div>
+        <span class="login-left-logo-text">Campus Insights<br><small style="font-size:11px;opacity:.6">Placement Portal</small></span>
+      </div>
+      <h2>Welcome Student!</h2>
+      <p>Sign in to your account to track your placement journey and explore opportunities.</p>
+      <div class="login-left-img">👩‍💻</div>
+    </div>
+    <div class="login-right">
+      <h2>Student Login</h2>
+      <p>Sign in to your account</p>
+      <div class="form-group">
+        <label class="form-label">Roll Number</label>
+        <div class="form-input-wrap">
+          <span class="form-input-icon">🎓</span>
+          <input class="form-input" id="stu-roll" type="text" placeholder="Enter your roll number" value="501"/>
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Password</label>
+        <div class="form-input-wrap">
+          <span class="form-input-icon">🔒</span>
+          <input class="form-input" id="stu-pass" type="password" placeholder="••••••••••" value="student123"/>
+        </div>
+      </div>
+      <div class="form-row">
+        <label class="form-check"><input type="checkbox"/> Remember Me</label>
+        <a class="form-link">Forgot Password?</a>
+      </div>
+      <button class="login-btn green" onclick="studentLogin()">Login</button>
+      <div class="login-back">Back to role selection? <span onclick="showPage('page-role')">Click here</span></div>
+      <div class="login-secure">🔒 Track your placement journey and explore opportunities</div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════
+  PAGE 5: ADMIN DASHBOARD
+═══════════════════════════════════════════════════ -->
+<div id="page-admin-dashboard" class="page">
+  <!-- SIDEBAR -->
+  <div class="sidebar">
+    <div class="sidebar-logo">
+      <div class="sidebar-logo-top">
+        <div class="sidebar-logo-icon">🎓</div>
+        <span class="sidebar-logo-text">Campus Insights</span>
+      </div>
+      <div class="sidebar-logo-sub">Placement Analytics</div>
+    </div>
+    <nav class="sidebar-nav">
+      <div class="sidebar-section">Main</div>
+      <div class="nav-item active" onclick="showSection('sec-dashboard',this)"><span class="nav-item-icon">📊</span>Dashboard</div>
+      <div class="nav-item" onclick="showSection('sec-students',this)"><span class="nav-item-icon">👨‍🎓</span>Students</div>
+      <div class="nav-item" onclick="showSection('sec-companies',this)"><span class="nav-item-icon">🏢</span>Companies</div>
+      <div class="nav-item" onclick="showSection('sec-placements',this)"><span class="nav-item-icon">✅</span>Placements</div>
+      <div class="sidebar-section">Insights</div>
+      <div class="nav-item" onclick="showSection('sec-analytics',this)"><span class="nav-item-icon">📈</span>Analytics</div>
+      <div class="nav-item" onclick="showSection('sec-reports',this)"><span class="nav-item-icon">📋</span>Reports</div>
+      <div class="sidebar-section">System</div>
+      <div class="nav-item" onclick="showSection('sec-settings',this)"><span class="nav-item-icon">⚙️</span>Settings</div>
+    </nav>
+    <div class="sidebar-user">
+      <div class="sidebar-avatar">RK</div>
+      <div class="sidebar-user-info"><strong>Dr. Rajesh Kumar</strong><span>T&P Officer</span></div>
+      <span class="sidebar-logout" onclick="showPage('page-landing')" title="Logout">⏻</span>
+    </div>
+  </div>
+
+  <!-- MAIN CONTENT -->
+  <div class="main-content">
+    <div class="topbar">
+      <div class="topbar-title" id="topbar-title">Dashboard</div>
+      <div class="topbar-right">
+        <div class="topbar-year">📅 2023-24 ▾</div>
+        <div class="topbar-bell">🔔<div class="topbar-badge"></div></div>
+      </div>
+    </div>
+
+    <!-- DASHBOARD SECTION -->
+    <div id="sec-dashboard" class="section-content active">
+      <div class="kpi-grid">
+        <div class="kpi-card">
+          <div class="kpi-top"><div class="kpi-icon" style="background:#dbeafe;">👨‍🎓</div><span class="kpi-badge up">↑ 8.5%</span></div>
+          <div class="kpi-val">1,248</div><div class="kpi-label">Total Students</div>
+        </div>
+        <div class="kpi-card">
+          <div class="kpi-top"><div class="kpi-icon" style="background:#dcfce7;">✅</div><span class="kpi-badge up">↑ 4.7%</span></div>
+          <div class="kpi-val">987</div><div class="kpi-label">Placed Students</div>
+        </div>
+        <div class="kpi-card">
+          <div class="kpi-top"><div class="kpi-icon" style="background:#fef3c7;">📊</div><span class="kpi-badge up">↑ 6.7%</span></div>
+          <div class="kpi-val">79.10%</div><div class="kpi-label">Placement Rate</div>
+        </div>
+        <div class="kpi-card">
+          <div class="kpi-top"><div class="kpi-icon" style="background:#f3e8ff;">💰</div><span class="kpi-badge up">↑ 10.3%</span></div>
+          <div class="kpi-val">₹32.5 LPA</div><div class="kpi-label">Highest Package</div>
+        </div>
+      </div>
+
+      <div class="charts-grid">
+        <div class="chart-card">
+          <div class="chart-header">
+            <div><div class="chart-title">Placement Trend (Year-wise)</div><div class="chart-subtitle">2020–2024</div></div>
+            <span class="chart-tag">Live</span>
+          </div>
+          <div class="chart-wrap"><canvas id="trendChart"></canvas></div>
+        </div>
+        <div class="chart-card">
+          <div class="chart-header"><div class="chart-title">Branch-wise Placement Rate</div></div>
+          <div class="chart-wrap"><canvas id="branchPieChart"></canvas></div>
+        </div>
+      </div>
+
+      <div class="recent-grid">
+        <div class="chart-card">
+          <div class="chart-header"><div class="chart-title">Branch Placement % Breakdown</div></div>
+          <div class="mini-table">
+            <div class="mini-table-row">
+              <span class="mini-table-label">CSE</span>
+              <div class="mini-table-bar-wrap"><div class="mini-table-bar" style="width:90%;background:#3b82f6;"></div></div>
+              <span class="mini-table-val">90%</span>
+            </div>
+            <div class="mini-table-row">
+              <span class="mini-table-label">IT</span>
+              <div class="mini-table-bar-wrap"><div class="mini-table-bar" style="width:80%;background:#8b5cf6;"></div></div>
+              <span class="mini-table-val">80%</span>
+            </div>
+            <div class="mini-table-row">
+              <span class="mini-table-label">Mechanical</span>
+              <div class="mini-table-bar-wrap"><div class="mini-table-bar" style="width:60%;background:#f59e0b;"></div></div>
+              <span class="mini-table-val">60%</span>
+            </div>
+            <div class="mini-table-row">
+              <span class="mini-table-label">Civil</span>
+              <div class="mini-table-bar-wrap"><div class="mini-table-bar" style="width:55%;background:#10b981;"></div></div>
+              <span class="mini-table-val">55%</span>
+            </div>
+          </div>
+          <div style="margin-top:16px;"><div class="chart-wrap" style="height:160px;"><canvas id="branchBarChart"></canvas></div></div>
+        </div>
+        <div class="chart-card">
+          <div class="chart-header"><div class="chart-title">Recent Activities</div></div>
+          <ul class="activity-list">
+            <li class="activity-item"><div class="activity-dot" style="background:#3b82f6;"></div><span class="activity-text">Wipro visited campus — 25 offers</span><span class="activity-time">Today</span></li>
+            <li class="activity-item"><div class="activity-dot" style="background:#10b981;"></div><span class="activity-text">TCS offered 35 offers</span><span class="activity-time">Yesterday</span></li>
+            <li class="activity-item"><div class="activity-dot" style="background:#f59e0b;"></div><span class="activity-text">New drive completed — Infosys</span><span class="activity-time">2 days ago</span></li>
+            <li class="activity-item"><div class="activity-dot" style="background:#8b5cf6;"></div><span class="activity-text">Microsoft drive scheduled</span><span class="activity-time">Next week</span></li>
+            <li class="activity-item"><div class="activity-dot" style="background:#ec4899;"></div><span class="activity-text">Amazon PPO — 3 students</span><span class="activity-time">3 days ago</span></li>
+          </ul>
+        </div>
+      </div>
+
+      <div style="margin-bottom:16px;">
+        <div class="chart-card">
+          <div class="chart-header"><div class="chart-title">Average Package</div><div class="chart-subtitle">₹6.25 LPA average across all branches</div></div>
+          <div class="kpi-grid" style="margin-bottom:0;">
+            <div class="kpi-card" style="border:none;padding:12px 0;">
+              <div class="kpi-val" style="font-size:20px;">180</div><div class="kpi-label">Companies Visited</div>
+            </div>
+            <div class="kpi-card" style="border:none;padding:12px 0;">
+              <div class="kpi-val" style="font-size:20px;">145</div><div class="kpi-label">Ongoing Drives</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- STUDENTS SECTION -->
+    <div id="sec-students" class="section-content">
+      <div class="table-header">
+        <span class="table-title">Students</span>
+        <button class="table-add-btn" onclick="openModal('add-student')">+ Add Student</button>
+      </div>
+      <div class="table-filters">
+        <input class="table-search" placeholder="Search by name, roll no or email…" oninput="filterTable('students-table',this.value)"/>
+        <select class="table-select" onchange="filterByBranch(this.value)">
+          <option value="">Branch: All</option>
+          <option>CSE</option><option>IT</option><option>Mechanical</option><option>Civil</option>
+        </select>
+        <select class="table-select">
+          <option>Placement Status: All</option>
+          <option>Placed</option><option>Not Placed</option>
+        </select>
+        <select class="table-select">
+          <option>Batch: 2024</option>
+          <option>2023</option><option>2022</option><option>2021</option><option>2020</option>
+        </select>
+        <button class="table-filter-btn">⚙ Filters</button>
+      </div>
+      <div class="table-wrap">
+        <table id="students-table">
+          <thead><tr><th>Roll No</th><th>Name</th><th>Branch</th><th>CGPA</th><th>Skills</th><th>Placement Status</th><th>Company</th><th>Package</th><th>Actions</th></tr></thead>
+          <tbody id="students-tbody"></tbody>
+        </table>
+        <div class="table-pagination">
+          <span class="pagination-info">Showing 1-10 of 50 entries</span>
+          <div class="pagination-btns">
+            <button class="page-btn active">1</button><button class="page-btn">2</button>
+            <button class="page-btn">3</button><button class="page-btn">→</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- COMPANIES SECTION -->
+    <div id="sec-companies" class="section-content">
+      <div class="table-header">
+        <span class="table-title">Companies</span>
+        <button class="table-add-btn" onclick="openModal('add-company')">+ Add Company</button>
+      </div>
+      <div class="table-filters">
+        <input class="table-search" placeholder="Search company name…"/>
+        <select class="table-select"><option>All Branches</option></select>
+        <select class="table-select"><option>All Status</option><option>Completed</option><option>Upcoming</option></select>
+        <select class="table-select"><option>All</option></select>
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Company Name</th><th>Package (LPA)</th><th>Eligibility</th><th>Visit Date</th><th>Offers</th><th>Status</th><th>Actions</th></tr></thead>
+          <tbody id="companies-tbody"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- PLACEMENTS SECTION -->
+    <div id="sec-placements" class="section-content">
+      <div class="table-header">
+        <span class="table-title">Placements</span>
+        <button class="table-add-btn">+ Add Placement</button>
+      </div>
+      <div class="table-filters">
+        <input class="table-search" placeholder="Search by student or company…"/>
+        <select class="table-select"><option>All Branches</option></select>
+        <select class="table-select"><option>All Companies</option></select>
+        <select class="table-select"><option>2023-24</option></select>
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Student Name</th><th>Branch</th><th>Company</th><th>Package (LPA)</th><th>Offer Status</th><th>Placement Date</th><th>Actions</th></tr></thead>
+          <tbody id="placements-tbody"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- ANALYTICS SECTION -->
+    <div id="sec-analytics" class="section-content">
+      <div class="analytics-tabs">
+        <button class="analytics-tab active">Overview</button>
+        <button class="analytics-tab">Branch Analysis</button>
+        <button class="analytics-tab">Company Analysis</button>
+        <button class="analytics-tab">Salary Analysis</button>
+        <button class="analytics-tab">Trend Analysis</button>
+      </div>
+      <div class="analytics-kpis">
+        <div class="analytics-kpi">
+          <div class="analytics-kpi-val">79.10%</div>
+          <div class="analytics-kpi-change up">↑ 4.3% vs last year</div>
+          <div class="analytics-kpi-label">Overall Placement Rate</div>
+        </div>
+        <div class="analytics-kpi">
+          <div class="analytics-kpi-val">₹6.25 LPA</div>
+          <div class="analytics-kpi-change up">↑ 8.2% vs last year</div>
+          <div class="analytics-kpi-label">Average Package</div>
+        </div>
+        <div class="analytics-kpi">
+          <div class="analytics-kpi-val">₹32.5 LPA</div>
+          <div class="analytics-kpi-change up">↑ 18.2% vs last year</div>
+          <div class="analytics-kpi-label">Highest Package</div>
+        </div>
+        <div class="analytics-kpi">
+          <div class="analytics-kpi-val">180</div>
+          <div class="analytics-kpi-change up">↑ 8.4% vs last year</div>
+          <div class="analytics-kpi-label">Companies Visited</div>
+        </div>
+      </div>
+      <div class="analytics-charts-main">
+        <div class="chart-card">
+          <div class="chart-header"><div class="chart-title">Year-wise Placement Trend</div></div>
+          <div class="chart-wrap"><canvas id="analyticsYearChart"></canvas></div>
+        </div>
+        <div class="chart-card">
+          <div class="chart-header"><div class="chart-title">Package Distribution</div></div>
+          <div class="chart-wrap"><canvas id="analyticsPkgChart"></canvas></div>
+        </div>
+        <div class="chart-card">
+          <div class="chart-header"><div class="chart-title">Branch-wise Placement %</div></div>
+          <div class="chart-wrap"><canvas id="analyticsBranchChart"></canvas></div>
+        </div>
+      </div>
+      <div class="analytics-bottom">
+        <div class="chart-card">
+          <div class="chart-title" style="margin-bottom:12px;">Top Recruiters</div>
+          <div class="mini-table">
+            <div class="mini-table-row"><span class="mini-table-label">TCS</span><div class="mini-table-bar-wrap"><div class="mini-table-bar" style="width:85%;background:#3b82f6;"></div></div><span class="mini-table-val">120</span></div>
+            <div class="mini-table-row"><span class="mini-table-label">Infosys</span><div class="mini-table-bar-wrap"><div class="mini-table-bar" style="width:65%;background:#8b5cf6;"></div></div><span class="mini-table-val">88</span></div>
+            <div class="mini-table-row"><span class="mini-table-label">Wipro</span><div class="mini-table-bar-wrap"><div class="mini-table-bar" style="width:58%;background:#10b981;"></div></div><span class="mini-table-val">81</span></div>
+            <div class="mini-table-row"><span class="mini-table-label">Microsoft</span><div class="mini-table-bar-wrap"><div class="mini-table-bar" style="width:40%;background:#f59e0b;"></div></div><span class="mini-table-val">55</span></div>
+            <div class="mini-table-row"><span class="mini-table-label">Amazon</span><div class="mini-table-bar-wrap"><div class="mini-table-bar" style="width:30%;background:#ec4899;"></div></div><span class="mini-table-val">42</span></div>
+          </div>
+        </div>
+        <div class="chart-card">
+          <div class="chart-title" style="margin-bottom:12px;">Average Package by Branch</div>
+          <div class="chart-wrap"><canvas id="avgPkgBranch"></canvas></div>
+        </div>
+        <div class="chart-card">
+          <div class="chart-title" style="margin-bottom:12px;">CGPA vs Package</div>
+          <div class="chart-wrap"><canvas id="cgpaScatter"></canvas></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- REPORTS SECTION -->
+    <div id="sec-reports" class="section-content">
+      <div class="chart-title" style="font-size:18px;margin-bottom:4px;">Reports</div>
+      <p class="reports-intro">Generate and download placement reports</p>
+      <div class="reports-grid">
+        <div class="report-card"><h4>📊 Placement Summary Report</h4><p>Overall placement performance summary</p><button class="report-gen-btn" onclick="showToast('Generating report…','success')">Generate Report</button></div>
+        <div class="report-card"><h4>🏫 Branch-wise Report</h4><p>Recruitment statistics by branch</p><button class="report-gen-btn" onclick="showToast('Generating report…','success')">Generate Report</button></div>
+        <div class="report-card"><h4>🏢 Company-wise Report</h4><p>Company offers and stats</p><button class="report-gen-btn" onclick="showToast('Generating report…','success')">Generate Report</button></div>
+        <div class="report-card"><h4>📅 Year-wise Trend Report</h4><p>Year-on-year placement trends</p><button class="report-gen-btn" onclick="showToast('Generating report…','success')">Generate Report</button></div>
+        <div class="report-card"><h4>👤 Student-wise Report</h4><p>Individual student placement status</p><button class="report-gen-btn" onclick="showToast('Generating report…','success')">Generate Report</button></div>
+        <div class="report-card"><h4>⚙ Custom Report</h4><p>Create custom report with filters</p><button class="report-gen-btn" onclick="showToast('Generating report…','success')">Generate Report</button></div>
+      </div>
+      <div class="reports-filters">
+        <h4>Report Filters</h4>
+        <div class="filter-row">
+          <div class="filter-group"><label>Select Batch</label><select><option>2023-24</option><option>2022-23</option><option>2021-22</option></select></div>
+          <div class="filter-group"><label>All Branches</label><select><option>All</option><option>CSE</option><option>IT</option><option>Mechanical</option><option>Civil</option></select></div>
+          <div class="filter-group"><label>Select Report Type</label><select><option>All Reports</option></select></div>
+        </div>
+        <button class="apply-filters-btn" onclick="showToast('Filters applied!','success')">Apply Filters</button>
+      </div>
+      <div class="recent-reports">
+        <h4>Recent Generated Reports</h4>
+        <table style="margin-top:8px;">
+          <thead><tr><th>Report Name</th><th>Type</th><th>Generated On</th><th>Generated By</th><th>Actions</th></tr></thead>
+          <tbody>
+            <tr><td>Placement Summary Report</td><td>Summary</td><td>19 May, 2024 10:30 AM</td><td>Dr. Rajesh Kumar</td><td><button class="table-add-btn" style="padding:5px 12px;font-size:12px;" onclick="showToast('Downloading…','success')">⬇ Download</button></td></tr>
+            <tr><td>CSE Branch Report</td><td>Branch-wise</td><td>18 May, 2024 03:15 PM</td><td>Dr. Rajesh Kumar</td><td><button class="table-add-btn" style="padding:5px 12px;font-size:12px;" onclick="showToast('Downloading…','success')">⬇ Download</button></td></tr>
+            <tr><td>TCS Company Report</td><td>Company-wise</td><td>17 May, 2024 11:20 AM</td><td>Dr. Rajesh Kumar</td><td><button class="table-add-btn" style="padding:5px 12px;font-size:12px;" onclick="showToast('Downloading…','success')">⬇ Download</button></td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- SETTINGS SECTION -->
+    <div id="sec-settings" class="section-content">
+      <div class="settings-grid">
+        <div class="settings-nav">
+          <div class="settings-nav-item active">👤 Profile</div>
+          <div class="settings-nav-item">🔒 Security</div>
+          <div class="settings-nav-item">🔔 Notifications</div>
+          <div class="settings-nav-item">🎨 Appearance</div>
+          <div class="settings-nav-item">📊 Data Management</div>
+        </div>
+        <div class="settings-panel">
+          <h3>Profile Settings</h3>
+          <p>Update your admin profile information</p>
+          <div class="settings-form">
+            <div class="form-group"><label class="form-label">Full Name</label><input class="form-input" value="Dr. Rajesh Kumar"/></div>
+            <div class="form-group"><label class="form-label">Email Address</label><input class="form-input" value="admin@college.edu"/></div>
+            <div class="form-group"><label class="form-label">Phone</label><input class="form-input" value="+91 9876543210"/></div>
+            <div class="form-group"><label class="form-label">Designation</label><input class="form-input" value="Training & Placement Officer"/></div>
+            <button class="save-btn" onclick="showToast('Profile saved!','success')">Save Changes</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════
+  PAGE 6: STUDENT DASHBOARD
+═══════════════════════════════════════════════════ -->
+<div id="page-student-dashboard" class="page">
+  <div class="sidebar" style="background:#0c4a6e;">
+    <div class="sidebar-logo">
+      <div class="sidebar-logo-top"><div class="sidebar-logo-icon" style="background:#0ea5e9;">🎓</div><span class="sidebar-logo-text">Campus Insights</span></div>
+      <div class="sidebar-logo-sub">Placement Portal</div>
+    </div>
+    <nav class="sidebar-nav">
+      <div class="nav-item active" style="border-left-color:#0ea5e9;">📊 Dashboard</div>
+      <div class="nav-item">👤 Profile</div>
+      <div class="nav-item">📝 My Applications</div>
+      <div class="nav-item">🏢 Companies</div>
+      <div class="nav-item">✅ Placements</div>
+      <div class="nav-item">🔔 Notifications</div>
+      <div class="nav-item">📄 Resume</div>
+      <div class="nav-item">⚙ Settings</div>
+    </nav>
+    <div class="sidebar-user">
+      <div class="sidebar-avatar" style="background:#0ea5e9;">AS</div>
+      <div class="sidebar-user-info"><strong>Aarav Sharma</strong><span>20CS001</span></div>
+      <span class="sidebar-logout" onclick="showPage('page-landing')" title="Logout">⏻</span>
+    </div>
+  </div>
+
+  <div class="main-content">
+    <div class="topbar">
+      <div class="topbar-title">Student Dashboard</div>
+      <div class="topbar-right">
+        <div class="topbar-bell">🔔<div class="topbar-badge"></div></div>
+        <div style="display:flex;align-items:center;gap:8px;">
+          <div style="width:32px;height:32px;background:#0ea5e9;border-radius:50%;display:flex;align-items:center;justify-content:center;color:white;font-size:13px;font-weight:700;">AS</div>
+        </div>
+      </div>
+    </div>
+    <div class="student-content">
+      <div class="welcome-banner">
+        <h2>Welcome back, Aarav! 👋</h2>
+        <p>Here's your placement overview</p>
+      </div>
+
+      <div class="student-status-card">
+        <div style="font-size:14px;font-weight:700;color:var(--gray-800);margin-bottom:14px;">Placement Status Overview</div>
+        <div class="status-row">
+          <div class="status-item"><div class="status-item-label">Placement Status</div><span class="badge placed">✓ Placed</span></div>
+          <div class="status-item"><div class="status-item-label">Company</div><div class="status-item-val">Amazon</div></div>
+          <div class="status-item"><div class="status-item-label">Package Offered</div><div class="status-item-val" style="color:var(--green);font-size:16px;">₹9.0 LPA</div></div>
+          <div class="status-item"><div class="status-item-label">Role</div><div class="status-item-val">Software Engineer</div></div>
+          <div class="status-item"><div class="status-item-label">Offer Status</div><span class="badge accepted">✓ Accepted</span></div>
+        </div>
+      </div>
+
+      <div class="student-grid">
+        <div class="chart-card">
+          <div class="chart-title" style="margin-bottom:14px;">Application Timeline</div>
+          <div class="timeline-item"><div class="timeline-icon" style="background:#dbeafe;">📝</div><div class="timeline-text"><strong>TCS — Applied</strong><span>15 Aug, 2024</span></div><span class="badge upcoming" style="margin-left:auto;">Applied</span></div>
+          <div class="timeline-item"><div class="timeline-icon" style="background:#fef3c7;">📋</div><div class="timeline-text"><strong>Aptitude Test</strong><span>17 Aug, 2024</span></div><span class="badge placed" style="margin-left:auto;">Cleared</span></div>
+          <div class="timeline-item"><div class="timeline-icon" style="background:#dcfce7;">💬</div><div class="timeline-text"><strong>Technical Interview</strong><span>18 Aug, 2024</span></div><span class="badge placed" style="margin-left:auto;">Cleared</span></div>
+          <div class="timeline-item"><div class="timeline-icon" style="background:#f3e8ff;">🤝</div><div class="timeline-text"><strong>HR Interview</strong><span>19 Aug, 2024</span></div><span class="badge placed" style="margin-left:auto;">Cleared</span></div>
+          <div class="timeline-item"><div class="timeline-icon" style="background:#dcfce7;">🎉</div><div class="timeline-text"><strong>Offer Received</strong><span>19 Aug, 2024</span></div><span class="badge placed" style="margin-left:auto;">Received</span></div>
+          <div class="timeline-item"><div class="timeline-icon" style="background:#dcfce7;">✅</div><div class="timeline-text"><strong>Offer Accepted</strong><span>20 Aug, 2024</span></div><span class="badge accepted" style="margin-left:auto;">Accepted</span></div>
+        </div>
+
+        <div>
+          <div class="chart-card" style="margin-bottom:16px;">
+            <div class="chart-title" style="margin-bottom:14px;">My Applications</div>
+            <table>
+              <thead><tr><th>Company</th><th>Status</th></tr></thead>
+              <tbody>
+                <tr><td>TCS</td><td><span class="badge placed">Applied — Offer Placed</span></td></tr>
+                <tr><td>Infosys</td><td><span class="badge not-placed">Not Selected</span></td></tr>
+                <tr><td>Wipro</td><td><span class="badge upcoming">Interview Scheduled</span></td></tr>
+                <tr><td>Capgemini</td><td><span class="badge not-placed">Not Selected</span></td></tr>
+                <tr><td>Amazon</td><td><span class="badge accepted">Offer Accepted ✓</span></td></tr>
+              </tbody>
+            </table>
+          </div>
+          <div class="profile-completion chart-card">
+            <div class="chart-title" style="margin-bottom:8px;">Profile Completion</div>
+            <div class="profile-pct">85%</div>
+            <div class="profile-bar-wrap"><div class="profile-bar" style="width:85%;"></div></div>
+            <p style="font-size:12px;color:var(--gray-500);text-align:center;">Complete your profile to get more opportunities</p>
+            <button class="login-btn green" style="margin-top:12px;padding:10px;" onclick="showToast('Opening profile editor…','success')">Update Profile</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL: Add Student -->
+<div class="modal-overlay" id="modal-add-student">
+  <div class="modal">
+    <div class="modal-header"><span class="modal-title">Add New Student</span><button class="modal-close" onclick="closeModal('add-student')">✕</button></div>
+    <div class="form-group"><label class="form-label">Full Name</label><input class="form-input" placeholder="Student full name"/></div>
+    <div class="form-group"><label class="form-label">Roll Number</label><input class="form-input" placeholder="e.g. 20CS001"/></div>
+    <div class="form-group"><label class="form-label">Branch</label><select class="form-input"><option>CSE</option><option>IT</option><option>Mechanical</option><option>Civil</option></select></div>
+    <div class="form-group"><label class="form-label">CGPA</label><input class="form-input" type="number" step="0.1" min="0" max="10" placeholder="e.g. 8.5"/></div>
+    <div class="form-group"><label class="form-label">Batch Year</label><input class="form-input" type="number" placeholder="e.g. 2024"/></div>
+    <div class="modal-footer">
+      <button class="modal-cancel" onclick="closeModal('add-student')">Cancel</button>
+      <button class="modal-submit" onclick="addStudent()">Add Student</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL: Add Company -->
+<div class="modal-overlay" id="modal-add-company">
+  <div class="modal">
+    <div class="modal-header"><span class="modal-title">Add New Company</span><button class="modal-close" onclick="closeModal('add-company')">✕</button></div>
+    <div class="form-group"><label class="form-label">Company Name</label><input class="form-input" placeholder="e.g. Google"/></div>
+    <div class="form-group"><label class="form-label">Package (LPA)</label><input class="form-input" type="number" placeholder="e.g. 12"/></div>
+    <div class="form-group"><label class="form-label">Visit Date</label><input class="form-input" type="date"/></div>
+    <div class="form-group"><label class="form-label">Eligibility (Min CGPA)</label><input class="form-input" type="number" step="0.1" placeholder="e.g. 7.0"/></div>
+    <div class="modal-footer">
+      <button class="modal-cancel" onclick="closeModal('add-company')">Cancel</button>
+      <button class="modal-submit" onclick="addCompany()">Add Company</button>
+    </div>
+  </div>
+</div>
+
+<!-- TOAST -->
+<div class="toast" id="toast"></div>
+
+<script>
+// ═══════════════════════════════════════════════
+// DATA — from your actual CSV
+// ═══════════════════════════════════════════════
+const students = [
+  {roll:101,name:"Rahul Sharma",branch:"CSE",year:2020,cgpa:8.5,placed:"Yes",company:"TCS",pkg:7.0,internship:"Yes"},
+  {roll:102,name:"Priya Patel",branch:"CSE",year:2020,cgpa:7.2,placed:"Yes",company:"Infosys",pkg:5.5,internship:"No"},
+  {roll:103,name:"Amit Singh",branch:"CSE",year:2020,cgpa:9.1,placed:"Yes",company:"Wipro",pkg:8.5,internship:"Yes"},
+  {roll:104,name:"Neha Gupta",branch:"CSE",year:2020,cgpa:6.8,placed:"No",company:"—",pkg:0,internship:"No"},
+  {roll:105,name:"Rohan Mehta",branch:"IT",year:2020,cgpa:8.0,placed:"Yes",company:"HCL",pkg:6.0,internship:"Yes"},
+  {roll:106,name:"Sneha Joshi",branch:"IT",year:2020,cgpa:7.5,placed:"Yes",company:"Cognizant",pkg:5.0,internship:"No"},
+  {roll:107,name:"Vikram Rao",branch:"Mechanical",year:2020,cgpa:7.0,placed:"No",company:"—",pkg:0,internship:"No"},
+  {roll:108,name:"Pooja Desai",branch:"Mechanical",year:2020,cgpa:8.2,placed:"Yes",company:"L&T",pkg:4.5,internship:"Yes"},
+  {roll:109,name:"Arjun Nair",branch:"Civil",year:2020,cgpa:6.5,placed:"No",company:"—",pkg:0,internship:"No"},
+  {roll:110,name:"Divya Shah",branch:"Civil",year:2020,cgpa:7.8,placed:"Yes",company:"NHAI",pkg:3.8,internship:"No"},
+  {roll:201,name:"Karan Verma",branch:"CSE",year:2021,cgpa:8.9,placed:"Yes",company:"Accenture",pkg:9.0,internship:"Yes"},
+  {roll:202,name:"Anjali Mishra",branch:"CSE",year:2021,cgpa:7.6,placed:"Yes",company:"TCS",pkg:6.5,internship:"Yes"},
+  {roll:203,name:"Siddharth Kumar",branch:"CSE",year:2021,cgpa:6.9,placed:"No",company:"—",pkg:0,internship:"No"},
+  {roll:204,name:"Riya Agarwal",branch:"CSE",year:2021,cgpa:9.3,placed:"Yes",company:"Amazon",pkg:18.0,internship:"Yes"},
+  {roll:205,name:"Mohit Tiwari",branch:"IT",year:2021,cgpa:8.1,placed:"Yes",company:"Infosys",pkg:5.5,internship:"Yes"},
+  {roll:206,name:"Kavya Reddy",branch:"IT",year:2021,cgpa:7.3,placed:"Yes",company:"Wipro",pkg:5.0,internship:"No"},
+  {roll:207,name:"Suresh Yadav",branch:"Mechanical",year:2021,cgpa:6.7,placed:"No",company:"—",pkg:0,internship:"No"},
+  {roll:208,name:"Meera Pillai",branch:"Mechanical",year:2021,cgpa:7.9,placed:"Yes",company:"Tata Motors",pkg:4.0,internship:"Yes"},
+  {roll:209,name:"Nikhil Pandey",branch:"Civil",year:2021,cgpa:6.4,placed:"No",company:"—",pkg:0,internship:"No"},
+  {roll:210,name:"Tanvi Bose",branch:"Civil",year:2021,cgpa:7.1,placed:"Yes",company:"NHAI",pkg:3.5,internship:"No"},
+  {roll:301,name:"Aakash Dubey",branch:"CSE",year:2022,cgpa:9.0,placed:"Yes",company:"Google",pkg:35.0,internship:"Yes"},
+  {roll:302,name:"Simran Kapoor",branch:"CSE",year:2022,cgpa:8.3,placed:"Yes",company:"Microsoft",pkg:22.0,internship:"Yes"},
+  {roll:303,name:"Rahul Thakur",branch:"CSE",year:2022,cgpa:7.7,placed:"Yes",company:"Accenture",pkg:8.0,internship:"Yes"},
+  {roll:304,name:"Nisha Soni",branch:"CSE",year:2022,cgpa:6.5,placed:"Yes",company:"TCS",pkg:5.5,internship:"No"},
+  {roll:305,name:"Vishal Jain",branch:"IT",year:2022,cgpa:8.6,placed:"Yes",company:"HCL",pkg:7.0,internship:"Yes"},
+  {roll:306,name:"Pallavi Singh",branch:"IT",year:2022,cgpa:7.4,placed:"Yes",company:"Cognizant",pkg:5.5,internship:"Yes"},
+  {roll:307,name:"Deepak Sharma",branch:"Mechanical",year:2022,cgpa:7.2,placed:"Yes",company:"Bosch",pkg:5.0,internship:"Yes"},
+  {roll:308,name:"Renu Gupta",branch:"Mechanical",year:2022,cgpa:6.8,placed:"No",company:"—",pkg:0,internship:"No"},
+  {roll:309,name:"Tarun Patil",branch:"Civil",year:2022,cgpa:7.5,placed:"Yes",company:"L&T",pkg:4.2,internship:"Yes"},
+  {roll:310,name:"Megha Trivedi",branch:"Civil",year:2022,cgpa:6.2,placed:"No",company:"—",pkg:0,internship:"No"},
+  {roll:401,name:"Harshit Bajaj",branch:"CSE",year:2023,cgpa:9.2,placed:"Yes",company:"Flipkart",pkg:20.0,internship:"Yes"},
+  {roll:402,name:"Ishaan Malhotra",branch:"CSE",year:2023,cgpa:8.7,placed:"Yes",company:"Wipro",pkg:10.0,internship:"Yes"},
+  {roll:403,name:"Deepika Nair",branch:"CSE",year:2023,cgpa:7.9,placed:"Yes",company:"Infosys",pkg:7.0,internship:"Yes"},
+  {roll:404,name:"Rohit Srivastava",branch:"CSE",year:2023,cgpa:6.6,placed:"No",company:"—",pkg:0,internship:"No"},
+  {roll:405,name:"Yukta Pandey",branch:"IT",year:2023,cgpa:8.4,placed:"Yes",company:"TCS",pkg:7.5,internship:"Yes"},
+  {roll:406,name:"Manish Tomar",branch:"IT",year:2023,cgpa:7.0,placed:"Yes",company:"HCL",pkg:5.5,internship:"No"},
+  {roll:407,name:"Shivani Rawat",branch:"Mechanical",year:2023,cgpa:7.6,placed:"Yes",company:"Mahindra",pkg:4.8,internship:"Yes"},
+  {roll:408,name:"Arun Saxena",branch:"Mechanical",year:2023,cgpa:6.3,placed:"No",company:"—",pkg:0,internship:"No"},
+  {roll:409,name:"Preethi Menon",branch:"Civil",year:2023,cgpa:7.8,placed:"Yes",company:"NHAI",pkg:4.0,internship:"Yes"},
+  {roll:410,name:"Gaurav Choudhary",branch:"Civil",year:2023,cgpa:6.1,placed:"No",company:"—",pkg:0,internship:"No"},
+  {roll:501,name:"Shreya Kulkarni",branch:"CSE",year:2024,cgpa:9.4,placed:"Yes",company:"Amazon",pkg:25.0,internship:"Yes"},
+  {roll:502,name:"Ankit Rastogi",branch:"CSE",year:2024,cgpa:8.8,placed:"Yes",company:"Microsoft",pkg:28.0,internship:"Yes"},
+  {roll:503,name:"Pooja Yadav",branch:"CSE",year:2024,cgpa:8.1,placed:"Yes",company:"Accenture",pkg:10.0,internship:"Yes"},
+  {roll:504,name:"Dev Mishra",branch:"CSE",year:2024,cgpa:7.3,placed:"Yes",company:"TCS",pkg:6.5,internship:"No"},
+  {roll:505,name:"Kritika Singh",branch:"IT",year:2024,cgpa:8.5,placed:"Yes",company:"Cognizant",pkg:7.0,internship:"Yes"},
+  {roll:506,name:"Sachin Bhatt",branch:"IT",year:2024,cgpa:7.6,placed:"Yes",company:"Wipro",pkg:5.5,internship:"Yes"},
+  {roll:507,name:"Nandini Joshi",branch:"Mechanical",year:2024,cgpa:7.4,placed:"Yes",company:"L&T",pkg:5.2,internship:"Yes"},
+  {roll:508,name:"Saurabh Pandey",branch:"Mechanical",year:2024,cgpa:6.5,placed:"No",company:"—",pkg:0,internship:"No"},
+  {roll:509,name:"Lavanya Iyer",branch:"Civil",year:2024,cgpa:7.7,placed:"Yes",company:"NHAI",pkg:4.5,internship:"Yes"},
+  {roll:510,name:"Kartik Sharma",branch:"Civil",year:2024,cgpa:6.0,placed:"No",company:"—",pkg:0,internship:"No"},
+];
+
+const companies = [
+  {name:"TCS",pkg:"3.5–7.0",eligibility:"6.0 CGPA, No Backlogs",date:"12 Aug, 2024",offers:18,status:"Completed"},
+  {name:"Infosys",pkg:"4.5–8.0",eligibility:"6.5 CGPA, No Backlogs",date:"14 Aug, 2024",offers:14,status:"Completed"},
+  {name:"Wipro",pkg:"3.5–7.5",eligibility:"6.0 CGPA, No Backlogs",date:"15 Aug, 2024",offers:12,status:"Completed"},
+  {name:"Accenture",pkg:"4.5–9.0",eligibility:"7.0 CGPA, No Backlogs",date:"18 Aug, 2024",offers:10,status:"Completed"},
+  {name:"Amazon",pkg:"12.0–25.0",eligibility:"7.5 CGPA, No Backlogs",date:"02 Sep, 2024",offers:3,status:"Completed"},
+  {name:"Google",pkg:"20.0–35.0",eligibility:"8.0 CGPA, No Backlogs",date:"05 Sep, 2024",offers:1,status:"Completed"},
+  {name:"Microsoft",pkg:"15.0–28.0",eligibility:"7.5 CGPA, No Backlogs",date:"05 Sep, 2024",offers:2,status:"Completed"},
+  {name:"Capgemini",pkg:"3.8–6.5",eligibility:"6.0 CGPA, No Backlogs",date:"15 Sep, 2024",offers:8,status:"Upcoming"},
+  {name:"L&T",pkg:"4.0–5.5",eligibility:"7.0 CGPA, No Backlogs",date:"20 Sep, 2024",offers:4,status:"Upcoming"},
+];
+
+const skillsMap = {CSE:["Python, ML"],IT:["Java, SQL"],Mechanical:["AutoCAD"],Civil:["STAAD, Civil 3D"]};
+const branchColors = {CSE:"cse",IT:"it",Mechanical:"mechanical",Civil:"civil"};
+
+// ═══════════════════════════════════════════════
+// PAGE NAVIGATION
+// ═══════════════════════════════════════════════
+function showPage(id){
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  if(id==='page-admin-dashboard') initAdminDashboard();
+}
+
+function showSection(id, el){
+  document.querySelectorAll('.section-content').forEach(s=>s.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  if(el) el.classList.add('active');
+  const titles={
+    'sec-dashboard':'Dashboard','sec-students':'Students Management',
+    'sec-companies':'Companies Management','sec-placements':'Placements Management',
+    'sec-analytics':'Analytics Dashboard','sec-reports':'Reports',
+    'sec-settings':'Settings'
+  };
+  document.getElementById('topbar-title').textContent = titles[id]||'Dashboard';
+  if(id==='sec-analytics') setTimeout(initAnalyticsCharts,100);
+}
+
+// ═══════════════════════════════════════════════
+// AUTH
+// ═══════════════════════════════════════════════
+function adminLogin(){
+  const u=document.getElementById('admin-user').value;
+  const p=document.getElementById('admin-pass').value;
+  const err=document.getElementById('admin-error');
+  if(u==='admin'&&p==='admin123'){
+    err.style.display='none';
+    showToast('Welcome, Dr. Rajesh Kumar!','success');
+    setTimeout(()=>showPage('page-admin-dashboard'),400);
+  } else {
+    err.style.display='block';
+  }
+}
+function studentLogin(){
+  showToast('Welcome back, Aarav!','success');
+  setTimeout(()=>showPage('page-student-dashboard'),400);
+}
+
+// ═══════════════════════════════════════════════
+// POPULATE TABLES
+// ═══════════════════════════════════════════════
+function initAdminDashboard(){
+  renderStudents(students);
+  renderCompanies();
+  renderPlacements();
+  setTimeout(initDashboardCharts,100);
+}
+
+function renderStudents(data){
+  const tb = document.getElementById('students-tbody');
+  if(!tb) return;
+  tb.innerHTML = data.slice(0,10).map(s=>`
+    <tr>
+      <td><strong>${s.roll}</strong></td>
+      <td>${s.name}</td>
+      <td><span class="badge ${branchColors[s.branch]||''}">${s.branch}</span></td>
+      <td>${s.cgpa}</td>
+      <td>${(skillsMap[s.branch]||['—'])[0]}</td>
+      <td><span class="badge ${s.placed==='Yes'?'placed':'not-placed'}">${s.placed==='Yes'?'✓ Placed':'✗ Not Placed'}</span></td>
+      <td>${s.placed==='Yes'?s.company:'—'}</td>
+      <td>${s.pkg>0?'₹'+s.pkg+' LPA':'—'}</td>
+      <td><div class="table-actions"><button class="action-btn edit" title="Edit">✏</button><button class="action-btn del" title="Delete" onclick="deleteRow(this)">🗑</button></div></td>
+    </tr>`).join('');
+}
+
+function renderCompanies(){
+  const tb = document.getElementById('companies-tbody');
+  if(!tb) return;
+  tb.innerHTML = companies.map(c=>`
+    <tr>
+      <td><strong>${c.name}</strong></td>
+      <td>${c.pkg}</td>
+      <td style="font-size:12px;">${c.eligibility}</td>
+      <td>${c.date}</td>
+      <td><strong>${c.offers}</strong></td>
+      <td><span class="badge ${c.status==='Completed'?'completed':'upcoming'}">${c.status}</span></td>
+      <td><div class="table-actions"><button class="action-btn edit">✏</button><button class="action-btn del" onclick="deleteRow(this)">🗑</button></div></td>
+    </tr>`).join('');
+}
+
+function renderPlacements(){
+  const tb = document.getElementById('placements-tbody');
+  if(!tb) return;
+  const placed = students.filter(s=>s.placed==='Yes').slice(0,10);
+  tb.innerHTML = placed.map(s=>`
+    <tr>
+      <td>${s.name}</td>
+      <td><span class="badge ${branchColors[s.branch]||''}">${s.branch}</span></td>
+      <td>${s.company}</td>
+      <td>₹${s.pkg} LPA</td>
+      <td><span class="badge accepted">✓ Accepted</span></td>
+      <td>20 Aug, 2024</td>
+      <td><div class="table-actions"><button class="action-btn edit">✏</button><button class="action-btn del" onclick="deleteRow(this)">🗑</button></div></td>
+    </tr>`).join('');
+}
+
+function filterTable(tableId, val){
+  const rows = document.querySelectorAll(`#${tableId} tbody tr`);
+  rows.forEach(r=>{
+    r.style.display = r.textContent.toLowerCase().includes(val.toLowerCase()) ? '' : 'none';
+  });
+}
+function filterByBranch(val){
+  if(!val){renderStudents(students);return;}
+  renderStudents(students.filter(s=>s.branch===val));
+}
+function deleteRow(btn){ btn.closest('tr').remove(); showToast('Record deleted','success'); }
+
+// ═══════════════════════════════════════════════
+// CHARTS — DASHBOARD
+// ═══════════════════════════════════════════════
+let chartsInit = false;
+function initDashboardCharts(){
+  if(chartsInit) return; chartsInit=true;
+
+  // Year trend
+  const years=[2020,2021,2022,2023,2024];
+  const yearPct = years.map(y=>{
+    const ys=students.filter(s=>s.year===y);
+    return Math.round(ys.filter(s=>s.placed==='Yes').length/ys.length*100);
+  });
+  new Chart(document.getElementById('trendChart'),{
+    type:'line',
+    data:{labels:years,datasets:[{label:'Placement %',data:yearPct,borderColor:'#3b82f6',backgroundColor:'rgba(59,130,246,.1)',fill:true,tension:.4,pointBackgroundColor:'#3b82f6',pointRadius:5}]},
+    options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{y:{min:0,max:100,ticks:{callback:v=>v+'%'},grid:{color:'rgba(0,0,0,.05)'}},x:{grid:{display:false}}}}
+  });
+
+  // Branch pie
+  const branches=['CSE','IT','Mechanical','Civil'];
+  const branchPct=branches.map(b=>{const bs=students.filter(s=>s.branch===b);return Math.round(bs.filter(s=>s.placed==='Yes').length/bs.length*100);});
+  new Chart(document.getElementById('branchPieChart'),{
+    type:'doughnut',
+    data:{labels:branches,datasets:[{data:branchPct,backgroundColor:['#3b82f6','#8b5cf6','#f59e0b','#10b981'],borderWidth:2,borderColor:'#fff'}]},
+    options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'bottom',labels:{font:{size:11}}}}}
+  });
+
+  // Branch bar small
+  new Chart(document.getElementById('branchBarChart'),{
+    type:'bar',
+    data:{labels:branches,datasets:[{label:'Placed',data:branches.map(b=>students.filter(s=>s.branch===b&&s.placed==='Yes').length),backgroundColor:['#3b82f6','#8b5cf6','#f59e0b','#10b981']},{label:'Not Placed',data:branches.map(b=>students.filter(s=>s.branch===b&&s.placed==='No').length),backgroundColor:['#bfdbfe','#ddd6fe','#fde68a','#bbf7d0']}]},
+    options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'bottom',labels:{font:{size:10}}}},scales:{x:{stacked:true,grid:{display:false}},y:{stacked:true,grid:{color:'rgba(0,0,0,.05)'}}}}
+  });
+}
+
+// ═══════════════════════════════════════════════
+// CHARTS — ANALYTICS
+// ═══════════════════════════════════════════════
+let analyticsInit=false;
+function initAnalyticsCharts(){
+  if(analyticsInit) return; analyticsInit=true;
+  const years=[2020,2021,2022,2023,2024];
+  const branches=['CSE','IT','Mechanical','Civil'];
+
+  new Chart(document.getElementById('analyticsYearChart'),{
+    type:'bar',
+    data:{labels:years,datasets:[{label:'Placement %',data:years.map(y=>{const ys=students.filter(s=>s.year===y);return Math.round(ys.filter(s=>s.placed==='Yes').length/ys.length*100);}),backgroundColor:'rgba(59,130,246,.8)',borderRadius:6}]},
+    options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{y:{min:0,max:100,ticks:{callback:v=>v+'%'}}}}
+  });
+
+  const pkgBuckets={'0-3':0,'3-6':0,'6-10':0,'10-20':0,'20+':0};
+  students.filter(s=>s.pkg>0).forEach(s=>{
+    if(s.pkg<3)pkgBuckets['0-3']++;
+    else if(s.pkg<6)pkgBuckets['3-6']++;
+    else if(s.pkg<10)pkgBuckets['6-10']++;
+    else if(s.pkg<20)pkgBuckets['10-20']++;
+    else pkgBuckets['20+']++;
+  });
+  new Chart(document.getElementById('analyticsPkgChart'),{
+    type:'doughnut',
+    data:{labels:Object.keys(pkgBuckets),datasets:[{data:Object.values(pkgBuckets),backgroundColor:['#bfdbfe','#93c5fd','#3b82f6','#1d4ed8','#1e3a5f'],borderWidth:2,borderColor:'#fff'}]},
+    options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'bottom',labels:{font:{size:10}}}}}
+  });
+
+  new Chart(document.getElementById('analyticsBranchChart'),{
+    type:'bar',
+    data:{labels:branches,datasets:[{label:'Placement %',data:branches.map(b=>{const bs=students.filter(s=>s.branch===b);return Math.round(bs.filter(s=>s.placed==='Yes').length/bs.length*100);}),backgroundColor:['#3b82f6','#8b5cf6','#f59e0b','#10b981'],borderRadius:6}]},
+    options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{y:{min:0,max:100,ticks:{callback:v=>v+'%'}}}}
+  });
+
+  new Chart(document.getElementById('avgPkgBranch'),{
+    type:'bar',
+    data:{labels:branches,datasets:[{label:'Avg LPA',data:branches.map(b=>{const ps=students.filter(s=>s.branch===b&&s.pkg>0);return ps.length?+(ps.reduce((a,s)=>a+s.pkg,0)/ps.length).toFixed(1):0;}),backgroundColor:['#3b82f6','#8b5cf6','#f59e0b','#10b981'],borderRadius:5}]},
+    options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{y:{ticks:{callback:v=>'₹'+v}}}}
+  });
+
+  const placed=students.filter(s=>s.placed==='Yes');
+  new Chart(document.getElementById('cgpaScatter'),{
+    type:'scatter',
+    data:{datasets:branches.map((b,i)=>({label:b,data:placed.filter(s=>s.branch===b).map(s=>({x:s.cgpa,y:s.pkg})),backgroundColor:['#3b82f6','#8b5cf6','#f59e0b','#10b981'][i],pointRadius:5}))},
+    options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'bottom',labels:{font:{size:9}}}},scales:{x:{title:{display:true,text:'CGPA'}},y:{title:{display:true,text:'Package (LPA)'}}}}
+  });
+}
+
+// ═══════════════════════════════════════════════
+// MODAL
+// ═══════════════════════════════════════════════
+function openModal(name){ document.getElementById('modal-'+name).classList.add('open'); }
+function closeModal(name){ document.getElementById('modal-'+name).classList.remove('open'); }
+function addStudent(){
+  showToast('Student added successfully!','success');
+  closeModal('add-student');
+}
+function addCompany(){
+  showToast('Company added successfully!','success');
+  closeModal('add-company');
+}
+
+// ═══════════════════════════════════════════════
+// TOAST
+// ═══════════════════════════════════════════════
+function showToast(msg,type=''){
+  const t=document.getElementById('toast');
+  t.textContent=msg; t.className='toast '+(type||'');
+  t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'),3000);
+}
+
+// ═══════════════════════════════════════════════
+// ANALYTICS TABS (UI only)
+// ═══════════════════════════════════════════════
+document.querySelectorAll('.analytics-tab').forEach(tab=>{
+  tab.addEventListener('click',function(){
+    document.querySelectorAll('.analytics-tab').forEach(t=>t.classList.remove('active'));
+    this.classList.add('active');
+  });
+});
+</script>
+</body>
+</html>

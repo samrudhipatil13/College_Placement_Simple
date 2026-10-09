@@ -1,0 +1,11 @@
+Student_ID,Student_Name,Department,CGPA,Company,Package_LPA,Placement_Status,Internship,Academic_Year
+101,Rahul,CSE,8.5,TCS,4.5,Placed,Yes,2024
+102,Priya,ECE,7.8,Infosys,3.6,Placed,No,2024
+103,Kiran,IT,8.9,Accenture,5.2,Placed,Yes,2024
+104,Anita,Mechanical,6.9,,0.0,Not Placed,No,2024
+105,Sneha,CSE,9.1,Capgemini,6.5,Placed,Yes,2024
+106,Amit,EEE,7.2,Wipro,3.8,Placed,No,2024
+107,Pooja,Civil,6.8,,0.0,Not Placed,No,2024
+108,Rohit,IT,8.0,Cognizant,4.2,Placed,Yes,2024
+109,Neha,CSE,8.7,IBM,7.0,Placed,Yes,2024
+110,Vikas,ECE,7.5,HCL,4.0,Placed,No,2024

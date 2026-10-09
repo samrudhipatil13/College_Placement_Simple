@@ -1,0 +1,51 @@
+Roll_No,Name,Branch,Year,CGPA,Placed,Company,Package_LPA,Internship
+101,Rahul Sharma,CSE,2020,8.5,Yes,TCS,7.0,Yes
+102,Priya Patel,CSE,2020,7.2,Yes,Infosys,5.5,No
+103,Amit Singh,CSE,2020,9.1,Yes,Wipro,8.5,Yes
+104,Neha Gupta,CSE,2020,6.8,No,Not Placed,0,No
+105,Rohan Mehta,IT,2020,8.0,Yes,HCL,6.0,Yes
+106,Sneha Joshi,IT,2020,7.5,Yes,Cognizant,5.0,No
+107,Vikram Rao,Mechanical,2020,7.0,No,Not Placed,0,No
+108,Pooja Desai,Mechanical,2020,8.2,Yes,L&T,4.5,Yes
+109,Arjun Nair,Civil,2020,6.5,No,Not Placed,0,No
+110,Divya Shah,Civil,2020,7.8,Yes,NHAI,3.8,No
+201,Karan Verma,CSE,2021,8.9,Yes,Accenture,9.0,Yes
+202,Anjali Mishra,CSE,2021,7.6,Yes,TCS,6.5,Yes
+203,Siddharth Kumar,CSE,2021,6.9,No,Not Placed,0,No
+204,Riya Agarwal,CSE,2021,9.3,Yes,Amazon,18.0,Yes
+205,Mohit Tiwari,IT,2021,8.1,Yes,Infosys,5.5,Yes
+206,Kavya Reddy,IT,2021,7.3,Yes,Wipro,5.0,No
+207,Suresh Yadav,Mechanical,2021,6.7,No,Not Placed,0,No
+208,Meera Pillai,Mechanical,2021,7.9,Yes,Tata Motors,4.0,Yes
+209,Nikhil Pandey,Civil,2021,6.4,No,Not Placed,0,No
+210,Tanvi Bose,Civil,2021,7.1,Yes,NHAI,3.5,No
+301,Aakash Dubey,CSE,2022,9.0,Yes,Google,35.0,Yes
+302,Simran Kapoor,CSE,2022,8.3,Yes,Microsoft,22.0,Yes
+303,Rahul Thakur,CSE,2022,7.7,Yes,Accenture,8.0,Yes
+304,Nisha Soni,CSE,2022,6.5,Yes,TCS,5.5,No
+305,Vishal Jain,IT,2022,8.6,Yes,HCL,7.0,Yes
+306,Pallavi Singh,IT,2022,7.4,Yes,Cognizant,5.5,Yes
+307,Deepak Sharma,Mechanical,2022,7.2,Yes,Bosch,5.0,Yes
+308,Renu Gupta,Mechanical,2022,6.8,No,Not Placed,0,No
+309,Tarun Patil,Civil,2022,7.5,Yes,L&T,4.2,Yes
+310,Megha Trivedi,Civil,2022,6.2,No,Not Placed,0,No
+401,Harshit Bajaj,CSE,2023,9.2,Yes,Flipkart,20.0,Yes
+402,Ishaan Malhotra,CSE,2023,8.7,Yes,Wipro,10.0,Yes
+403,Deepika Nair,CSE,2023,7.9,Yes,Infosys,7.0,Yes
+404,Rohit Srivastava,CSE,2023,6.6,No,Not Placed,0,No
+405,Yukta Pandey,IT,2023,8.4,Yes,TCS,7.5,Yes
+406,Manish Tomar,IT,2023,7.0,Yes,HCL,5.5,No
+407,Shivani Rawat,Mechanical,2023,7.6,Yes,Mahindra,4.8,Yes
+408,Arun Saxena,Mechanical,2023,6.3,No,Not Placed,0,No
+409,Preethi Menon,Civil,2023,7.8,Yes,NHAI,4.0,Yes
+410,Gaurav Choudhary,Civil,2023,6.1,No,Not Placed,0,No
+501,Shreya Kulkarni,CSE,2024,9.4,Yes,Amazon,25.0,Yes
+502,Ankit Rastogi,CSE,2024,8.8,Yes,Microsoft,28.0,Yes
+503,Pooja Yadav,CSE,2024,8.1,Yes,Accenture,10.0,Yes
+504,Dev Mishra,CSE,2024,7.3,Yes,TCS,6.5,No
+505,Kritika Singh,IT,2024,8.5,Yes,Cognizant,7.0,Yes
+506,Sachin Bhatt,IT,2024,7.6,Yes,Wipro,5.5,Yes
+507,Nandini Joshi,Mechanical,2024,7.4,Yes,L&T,5.2,Yes
+508,Saurabh Pandey,Mechanical,2024,6.5,No,Not Placed,0,No
+509,Lavanya Iyer,Civil,2024,7.7,Yes,NHAI,4.5,Yes
+510,Kartik Sharma,Civil,2024,6.0,No,Not Placed,0,No
